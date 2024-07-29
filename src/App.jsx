@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
+import axios from 'axios';
+import SearchBar from './components/SearchBar/SearchBar';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [search, setSearch] = useState('');
+  //const [currentPage, setCurrentPage] = useState('1');
+
+  useEffect(() => {
+    if (search !== '') {
+      try {
+        const searchParams = new URLSearchParams({
+          client_id: 'bF_HerDN5h7a7WozJpD-AEWD08N_mhzLLSreF6YpFxA',
+          query: search,
+          per_page: 15,
+          page: 1,
+        });
+
+        const dataRequest = async () => {
+          const response = await axios.get(
+            `https://api.unsplash.com/?${searchParams}`
+          );
+          return response.data;
+        };
+
+        console.log(dataRequest());
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, [search]);
+
+  const handleSearch = searchRequest => {
+    setSearch(searchRequest);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <SearchBar onSubmit={handleSearch} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
