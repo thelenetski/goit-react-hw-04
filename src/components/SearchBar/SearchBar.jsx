@@ -2,14 +2,17 @@ import css from './SearchBar.module.css';
 import { FaSearch } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 
-const SearchBar = ({ onSubmit }) => {
+const SearchBar = ({ onSubmit, data }) => {
   const handleSubmit = e => {
     e.preventDefault();
     const form = e.target;
-    if (form.elements.search.value === '') {
+    if (
+      form.elements.search.value.trim() === '' ||
+      /^\s*$/.test(form.elements.search.value.trim())
+    ) {
       return toast.error('Empty request, please write some text.');
     }
-    onSubmit(form.elements.search.value);
+    onSubmit(form.elements.search.value.trim());
     form.reset();
   };
 
@@ -30,6 +33,12 @@ const SearchBar = ({ onSubmit }) => {
           <FaSearch />
         </button>
       </form>
+      {data.total_pages > 0 && (
+        <div className={css.info}>
+          <p>{`Images: ${data.total}`}</p>
+          <p>{`Pages: ${data.total_pages}`}</p>
+        </div>
+      )}
     </header>
   );
 };
