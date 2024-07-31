@@ -116,7 +116,7 @@ function App() {
 
   const scrollWindow = () => {
     window.scrollBy({
-      top: galleryRef.current.height * 3 + 50,
+      top: galleryRef.current.height * 3,
       behavior: 'smooth',
     });
   };
@@ -125,7 +125,7 @@ function App() {
     <>
       <SearchBar onSubmit={handleSearch} data={imgData} />
       <div style={{ width: '100%', height: '120px' }}></div>
-      {imgData.total < 1 && <AiOutlinePicture className="bgIcon" />}
+      {imgData.total === undefined && <AiOutlinePicture className="bgIcon" />}
       {imgData.total > 0 && (
         <ImageGallery
           lastImageRef={galleryRef}
