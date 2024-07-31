@@ -125,7 +125,7 @@ function App() {
     <>
       <SearchBar onSubmit={handleSearch} data={imgData} />
       <div style={{ width: '100%', height: '120px' }}></div>
-      {imgData.total === undefined && <AiOutlinePicture className="bgIcon" />}
+      {!(imgData.total > 0) && <AiOutlinePicture className="bgIcon" />}
       {imgData.total > 0 && (
         <ImageGallery
           lastImageRef={galleryRef}
