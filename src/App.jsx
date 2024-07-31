@@ -59,9 +59,9 @@ function App() {
                 results: [...(prev.results ?? ''), ...data.results],
               };
             });
-            data.total_pages > 1 && setLoadMoreBtnState(true);
             data.total === 0 &&
               setErrorMsg('Nothing was found for your request');
+            checkPages(data.total_pages);
             setLoading(false);
           })
           .catch(error => {
@@ -91,11 +91,12 @@ function App() {
   };
 
   const handleLoadMore = () => {
-    checkPages() && setCurrentPage(currentPage + 1);
+    setCurrentPage(currentPage + 1);
   };
 
-  const checkPages = () => {
-    return currentPage + 1 > imgData.total_pages ? false : true;
+  const checkPages = dataPages => {
+    dataPages > 1 && setLoadMoreBtnState(true);
+    currentPage >= dataPages && setLoadMoreBtnState(false);
   };
 
   const handleOpenModal = (imageUrl, imgAlt, imgDescr, imgAuthor, imgLikes) => {
@@ -124,15 +125,15 @@ function App() {
     <>
       <SearchBar onSubmit={handleSearch} data={imgData} />
       <div style={{ width: '100%', height: '120px' }}></div>
-      {imgData.total === undefined && <AiOutlinePicture className="bgIcon" />}
-      {imgData.total !== undefined && (
+      {imgData.total < 1 && <AiOutlinePicture className="bgIcon" />}
+      {imgData.total > 0 && (
         <ImageGallery
           lastImageRef={galleryRef}
           data={imgData.results}
           onModal={handleOpenModal}
         />
       )}
-      {!loading && <ErrorMessage text={errorMsg} total={imgData.total} />}
+      {!loading && <ErrorMessage text={errorMsg} />}
       <ImageModal modalIsOpen={modalIsOpen} closeModal={handleCloseModal} />
       <Loader loading={loading} />
       {loadMoreBtnState && <LoadMoreBtn onNext={handleLoadMore} />}
