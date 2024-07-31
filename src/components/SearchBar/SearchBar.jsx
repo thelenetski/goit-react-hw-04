@@ -19,7 +19,7 @@ const SearchBar = ({ onSubmit, data }) => {
   return (
     <header className={css.search}>
       <div>
-        <Toaster position="top-right" reverseOrder={true} />
+        <Toaster position="top-left" reverseOrder={true} />
       </div>
       <form onSubmit={handleSubmit}>
         <input

@@ -8,6 +8,7 @@ import Loader from './components/Loader/Loader';
 import ImageModal from './components/ImageModal/ImageModal';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import { AiOutlinePicture } from 'react-icons/ai';
+import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
   const [search, setSearch] = useState('');
@@ -34,43 +35,43 @@ function App() {
   });
 
   useEffect(() => {
-    if (search !== '') {
-      try {
-        const dataRequest = async () => {
-          setLoading(true);
-          setErrorMsg('');
-          const response = await axios.get(
-            `https://api.unsplash.com/search/photos?${searchParams}`,
-            {
-              headers: {
-                Authorization: `Client-ID bF_HerDN5h7a7WozJpD-AEWD08N_mhzLLSreF6YpFxA`,
-              },
-            }
-          );
-          return response.data;
-        };
+    if (search === '') {
+      return;
+    }
+    try {
+      const dataRequest = async () => {
+        setLoading(true);
+        setErrorMsg('');
+        const response = await axios.get(
+          `https://api.unsplash.com/search/photos?${searchParams}`,
+          {
+            headers: {
+              Authorization: `Client-ID bF_HerDN5h7a7WozJpD-AEWD08N_mhzLLSreF6YpFxA`,
+            },
+          }
+        );
+        return response.data;
+      };
 
-        dataRequest()
-          .then(data => {
-            setImgData(prev => {
-              return {
-                total: data.total,
-                total_pages: data.total_pages,
-                results: [...(prev.results ?? ''), ...data.results],
-              };
-            });
-            data.total === 0 &&
-              setErrorMsg('Nothing was found for your request');
-            checkPages(data.total_pages);
-            setLoading(false);
-          })
-          .catch(error => {
-            setLoading(false);
-            setErrorMsg(error.message);
+      dataRequest()
+        .then(data => {
+          setImgData(prev => {
+            return {
+              total: data.total,
+              total_pages: data.total_pages,
+              results: [...(prev.results ?? ''), ...data.results],
+            };
           });
-      } catch (error) {
-        console.log(error);
-      }
+          data.total === 0 && setErrorMsg('Nothing was found for your request');
+          checkPages(data.total_pages);
+          setLoading(false);
+        })
+        .catch(error => {
+          setLoading(false);
+          setErrorMsg(error.message);
+        });
+    } catch (error) {
+      console.log(error);
     }
   }, [search, currentPage]);
 
@@ -79,9 +80,11 @@ function App() {
   }, [imgData, currentPage]);
 
   const handleSearch = searchRequest => {
+    if (searchRequest === search) {
+      return toast.error('This request already done, try another one');
+    }
     setCurrentPage(1);
     setLoadMoreBtnState(false);
-    setLoading(true);
     setImgData({
       total: imgData.total ?? 0,
       total_pages: imgData.total_pages ?? 0,
@@ -125,6 +128,9 @@ function App() {
     <>
       <SearchBar onSubmit={handleSearch} data={imgData} />
       <div style={{ width: '100%', height: '120px' }}></div>
+      <div>
+        <Toaster position="top-left" reverseOrder={true} />
+      </div>
       {!(imgData.total > 0) && <AiOutlinePicture className="bgIcon" />}
       {imgData.total > 0 && (
         <ImageGallery
